@@ -11,12 +11,12 @@
 
 
       <StringVectorProperty
-        name="file"
-        label="file"
-        initial_string="file"
+        name="dir"
+        label="dir"
+        initial_string="dir"
         command="SetParameter"
         animateable="1"
-        default_values="X:\caro\Vis_Bayr-Bahnhof\EnviMet\daniel\Conv 14.00.00 20.07.2015.txt"
+        default_values="X:\caro\Vis_Bayr-Bahnhof\EnviMet\daniel"
         number_of_elements="1">
         <Documentation></Documentation>
       </StringVectorProperty>
@@ -75,7 +75,7 @@
         name="Script"
         command="SetScript"
         number_of_elements="1"
-        default_values="import numpy as np&#xA;from vtk.util import numpy_support&#xA;&#xA;executive = self.GetExecutive()&#xA;outInfo = executive.GetOutputInformation(0)&#xA;updateExtent = [executive.UPDATE_EXTENT().Get(outInfo, i) for i in xrange(6)]&#xA;&#xA;data = np.genfromtxt(file, dtype=float, skip_header=1, delimiter=' ', autostrip=True, usecols = range(1,225+1))&#xA;VTK_data = numpy_support.numpy_to_vtk(num_array=data.ravel('F'), deep=True, array_type=vtk.VTK_FLOAT)&#xA;VTK_data.SetName(&quot;Data&quot;)&#xA;&#xA;out = self.GetOutput()&#xA;out.SetOrigin(origin)&#xA;out.SetSpacing(spacing, spacing, spacing)&#xA;out.SetDimensions(grid_size, grid_size, 1)&#xA;out.GetPointData().AddArray(VTK_data)&#xA;"
+        default_values="import os&#xA;import numpy as np&#xA;from vtk.util import numpy_support&#xA;&#xA;executive = self.GetExecutive()&#xA;outInfo = executive.GetOutputInformation(0)&#xA;updateExtent = [executive.UPDATE_EXTENT().Get(outInfo, i) for i in xrange(6)]&#xA;&#xA;out = self.GetOutput()&#xA;out.SetOrigin(origin)&#xA;out.SetSpacing(spacing, spacing, spacing)&#xA;out.SetDimensions(grid_size, grid_size, 1)&#xA;&#xA;for file in sorted(os.listdir(dir)):&#xA;    data = np.genfromtxt(dir + os.sep + file, dtype=float, skip_header=1, delimiter=' ', autostrip=True, usecols = range(1, grid_size + 1))&#xA;    VTK_data = numpy_support.numpy_to_vtk(num_array=data.ravel('F'), deep=True, array_type=vtk.VTK_FLOAT)&#xA;    VTK_data.SetName(os.path.basename(file))&#xA;    out.GetPointData().AddArray(VTK_data)&#xA;"
         panel_visibility="advanced">
         <Hints>
          <Widget type="multi_line"/>

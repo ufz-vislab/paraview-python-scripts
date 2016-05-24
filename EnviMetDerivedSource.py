@@ -10,13 +10,14 @@ InputDataType = ''
 OutputDataType = 'vtkImageData'
 ExtraXml = ''
 Properties = dict(
-    file = 'X:\\caro\\Vis_Bayr-Bahnhof\\EnviMet\\daniel\\Conv 14.00.00 20.07.2015.txt',
+    dir = 'X:\\caro\\Vis_Bayr-Bahnhof\\EnviMet\\daniel',
     origin = [0,0,0],
     spacing = 1.0,
     grid_size = 225
 )
 
 def RequestData():
+    import os
     import numpy as np
     from vtk.util import numpy_support
 
@@ -24,15 +25,16 @@ def RequestData():
     outInfo = executive.GetOutputInformation(0)
     updateExtent = [executive.UPDATE_EXTENT().Get(outInfo, i) for i in xrange(6)]
 
-    data = np.genfromtxt(file, dtype=float, skip_header=1, delimiter=' ', autostrip=True, usecols = range(1,225+1))
-    VTK_data = numpy_support.numpy_to_vtk(num_array=data.ravel('F'), deep=True, array_type=vtk.VTK_FLOAT)
-    VTK_data.SetName("Data")
-
     out = self.GetOutput()
     out.SetOrigin(origin)
     out.SetSpacing(spacing, spacing, spacing)
     out.SetDimensions(grid_size, grid_size, 1)
-    out.GetPointData().AddArray(VTK_data)
+
+    for file in sorted(os.listdir(dir)):
+        data = np.genfromtxt(dir + os.sep + file, dtype=float, skip_header=1, delimiter=' ', autostrip=True, usecols = range(1, grid_size + 1))
+        VTK_data = numpy_support.numpy_to_vtk(num_array=data.ravel('F'), deep=True, array_type=vtk.VTK_FLOAT)
+        VTK_data.SetName(os.path.basename(file))
+        out.GetPointData().AddArray(VTK_data)
 
 
 def RequestInformation():
