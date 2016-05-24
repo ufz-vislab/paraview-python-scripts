@@ -1,0 +1,105 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="sources">
+    <SourceProxy name="EnviMetDerivedSource" class="vtkPythonProgrammableFilter" label="EnviMet Derived Data Source">
+
+      <Documentation
+        long_help="Reads custom EnviMet-derived CSV data"
+        short_help="Reads custom EnviMet-derived CSV data">
+      </Documentation>
+
+
+
+
+      <StringVectorProperty
+        name="file"
+        label="file"
+        initial_string="file"
+        command="SetParameter"
+        animateable="1"
+        default_values="X:\caro\Vis_Bayr-Bahnhof\EnviMet\daniel\Conv 14.00.00 20.07.2015.txt"
+        number_of_elements="1">
+        <Documentation></Documentation>
+      </StringVectorProperty>
+
+
+      <IntVectorProperty
+        name="grid_size"
+        label="grid size"
+        initial_string="grid_size"
+        command="SetParameter"
+        animateable="1"
+        default_values="225"
+        number_of_elements="1">
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+
+      <IntVectorProperty
+        name="origin"
+        label="origin"
+        initial_string="origin"
+        command="SetParameter"
+        animateable="1"
+        default_values="0 0 0"
+        number_of_elements="3">
+        <Documentation></Documentation>
+      </IntVectorProperty>
+
+
+      <DoubleVectorProperty
+        name="spacing"
+        label="spacing"
+        initial_string="spacing"
+        command="SetParameter"
+        animateable="1"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation></Documentation>
+      </DoubleVectorProperty>
+
+
+
+
+      <!-- Output data type: "vtkImageData" -->
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="6"
+                         name="OutputDataSetType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>The value of this property determines the dataset type
+        for the output of the programmable filter.</Documentation>
+      </IntVectorProperty>
+
+
+      <StringVectorProperty
+        name="Script"
+        command="SetScript"
+        number_of_elements="1"
+        default_values="import numpy as np&#xA;from vtk.util import numpy_support&#xA;&#xA;executive = self.GetExecutive()&#xA;outInfo = executive.GetOutputInformation(0)&#xA;updateExtent = [executive.UPDATE_EXTENT().Get(outInfo, i) for i in xrange(6)]&#xA;&#xA;data = np.genfromtxt(file, dtype=float, skip_header=1, delimiter=' ', autostrip=True, usecols = range(1,225+1))&#xA;VTK_data = numpy_support.numpy_to_vtk(num_array=data.ravel('F'), deep=True, array_type=vtk.VTK_FLOAT)&#xA;VTK_data.SetName(&quot;Data&quot;)&#xA;&#xA;out = self.GetOutput()&#xA;out.SetOrigin(origin)&#xA;out.SetSpacing(spacing, spacing, spacing)&#xA;out.SetDimensions(grid_size, grid_size, 1)&#xA;out.GetPointData().AddArray(VTK_data)&#xA;"
+        panel_visibility="advanced">
+        <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+      <Documentation>This property contains the text of a python program that
+      the programmable source runs.</Documentation>
+      </StringVectorProperty>
+
+      <StringVectorProperty
+        name="InformationScript"
+        label="RequestInformation Script"
+        command="SetInformationScript"
+        number_of_elements="1"
+        default_values="executive = self.GetExecutive()&#xA;outInfo = executive.GetOutputInformation(0)&#xA;outInfo.Set(executive.WHOLE_EXTENT(), 0, grid_size-1, 0, grid_size-1, 0, 0)&#xA;outInfo.Set(vtk.vtkDataObject.SPACING(), spacing, spacing, spacing)&#xA;dataType = 10 # VTK_FLOAT&#xA;numberOfComponents = 1&#xA;vtk.vtkDataObject.SetPointDataActiveScalarInfo(outInfo, dataType, numberOfComponents)&#xA;"
+        panel_visibility="advanced">
+        <Hints>
+          <Widget type="multi_line" />
+        </Hints>
+        <Documentation>This property is a python script that is executed during
+        the RequestInformation pipeline pass. Use this to provide information
+        such as WHOLE_EXTENT to the pipeline downstream.</Documentation>
+      </StringVectorProperty>
+
+
+    </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
