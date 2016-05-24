@@ -1,0 +1,59 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="ArrayDiffFilter" class="vtkPythonProgrammableFilter" label="Array Diff Filter">
+
+      <Documentation
+        long_help="Creates diff arrays: Input2 - Input1"
+        short_help="Creates diff arrays: Input2 - Input1">
+      </Documentation>
+
+
+      <InputProperty
+        name="Input"
+                    clean_command="RemoveAllInputs"
+            command="AddInputConnection"
+            multiple_input="1">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkDataSet"/>
+          </DataTypeDomain>
+      </InputProperty>
+
+
+
+
+
+
+      <!-- Output data type: "Same as input" -->
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="8"
+                         name="OutputDataSetType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>The value of this property determines the dataset type
+        for the output of the programmable filter.</Documentation>
+      </IntVectorProperty>
+
+
+      <StringVectorProperty
+        name="Script"
+        command="SetScript"
+        number_of_elements="1"
+        default_values="def GetUpdateTimestep(algorithm):&#xA;    &quot;&quot;&quot;Returns the requested time value, or None if not present&quot;&quot;&quot;&#xA;    executive = algorithm.GetExecutive()&#xA;    outInfo = executive.GetOutputInformation(0)&#xA;    if not outInfo.Has(executive.UPDATE_TIME_STEP()):&#xA;        return None&#xA;    return outInfo.Get(executive.UPDATE_TIME_STEP())&#xA;&#xA;req_time = GetUpdateTimestep(self)&#xA;&#xA;A = self.GetInputDataObject(0, 0)&#xA;B = self.GetInputDataObject(0, 1)&#xA;pdo = self.GetOutput()&#xA;for arrayIndex in range(A.GetPointData().GetNumberOfArrays()):&#xA;    array = A.GetPointData().GetArrayName(arrayIndex)&#xA;    array0 = A.GetPointData().GetScalars(array)&#xA;    array1 = B.GetPointData().GetScalars(array)&#xA;    array_diff = vtk.vtkDoubleArray()&#xA;    array_diff.SetName(array + &quot;_diff&quot;)&#xA;    for i in range(A.GetNumberOfPoints()):&#xA;        array_diff.InsertNextValue(array1.GetValue(i) - array0.GetValue(i))&#xA;        pdo.GetPointData().AddArray(array_diff)&#xA;&#xA;pdo.GetInformation().Set(output.DATA_TIME_STEP(), req_time)&#xA;"
+        panel_visibility="advanced">
+        <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+      <Documentation>This property contains the text of a python program that
+      the programmable source runs.</Documentation>
+      </StringVectorProperty>
+
+
+
+    </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>

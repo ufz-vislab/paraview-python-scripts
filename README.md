@@ -3,7 +3,7 @@
 ### Create XML Plugin from Python file
 
 ```bash
-python python_filter_generator.py ArrayDiffFilter.py ArrayDiffFilter.xml
+python python_filter_generator.py ArrayDiffFilter.py plugins/ArrayDiffFilter.xml
 ```
 
 ## Usage
