@@ -3,8 +3,8 @@
     <SourceProxy name="StackedBarChartFilter" class="vtkPythonProgrammableFilter" label="Stacked Bar Chart Filter">
 
       <Documentation
-        long_help="Creates a stacked bar chart (as lines) of all point data data arrays"
-        short_help="Creates a stacked bar chart (as lines) of all point data data arrays">
+        long_help="Creates a stacked bar chart (as lines in z-direction) of all point data data arrays"
+        short_help="Creates a stacked bar chart (as lines in z-direction) of all point data data arrays">
       </Documentation>
 
 
@@ -53,7 +53,7 @@
         name="Script"
         command="SetScript"
         number_of_elements="1"
-        default_values="&#xA;pdi = self.GetPolyDataInput()&#xA;pdo = self.GetPolyDataOutput()&#xA;&#xA;numPoints = pdi.GetNumberOfPoints()&#xA;numVars = pdi.GetPointData().GetNumberOfArrays()&#xA;numCells = numPoints * numVars&#xA;&#xA;pdo.Allocate(numCells)&#xA;&#xA;newPoints = vtk.vtkPoints()&#xA;pdo.SetPoints(newPoints)&#xA;&#xA;valIdArray = vtk.vtkIntArray()&#xA;valIdArray.SetName(&quot;ArrayIds&quot;)&#xA;valIdArray.SetNumberOfComponents(1)&#xA;valIdArray.SetNumberOfTuples(numCells)&#xA;pdo.GetCellData().AddArray(valIdArray)&#xA;&#xA;for i in range(0, numPoints-1):&#xA;    currentPoint = pdi.GetPoints().GetPoint(i)&#xA;    basePointId = newPoints.InsertNextPoint(currentPoint)&#xA;    for v in range(0, numVars):&#xA;        value = pdi.GetPointData().GetArray(v).GetTuple1(i)&#xA;        newPointId = newPoints.InsertNextPoint(currentPoint[0], currentPoint[1], currentPoint[2] + value * scalingFactor)&#xA;        linepoints = [basePointId + v, newPointId]&#xA;        pdo.InsertNextCell(3, 2, linepoints) # VTK_LINE is 3&#xA;        valIdArray.SetValue(i*numVars + v, v)&#xA;"
+        default_values="pdi = self.GetPolyDataInput()&#xA;pdo = self.GetPolyDataOutput()&#xA;&#xA;numPoints = pdi.GetNumberOfPoints()&#xA;numVars = pdi.GetPointData().GetNumberOfArrays()&#xA;numCells = numPoints * numVars&#xA;&#xA;pdo.Allocate(numCells)&#xA;&#xA;newPoints = vtk.vtkPoints()&#xA;pdo.SetPoints(newPoints)&#xA;&#xA;valIdArray = vtk.vtkIntArray()&#xA;valIdArray.SetName(&quot;ArrayIds&quot;)&#xA;valIdArray.SetNumberOfComponents(1)&#xA;valIdArray.SetNumberOfTuples(numCells)&#xA;pdo.GetCellData().AddArray(valIdArray)&#xA;&#xA;for i in range(0, numPoints-1):&#xA;    currentPoint = pdi.GetPoints().GetPoint(i)&#xA;    basePointId = newPoints.InsertNextPoint(currentPoint)&#xA;    posIndex = 0&#xA;    negIndex = 0&#xA;    beginIndex = 0&#xA;    for v in range(0, numVars-1):&#xA;        value = pdi.GetPointData().GetArray(v).GetTuple1(i)&#xA;        if value &lt; 0:&#xA;            beginIndex = i * numVars + negIndex&#xA;            negIndex = v + 1&#xA;        else:&#xA;            beginIndex = i * numVars + posIndex&#xA;            posIndex = v + 1&#xA;&#xA;        beginPoint = newPoints.GetPoint(beginIndex)&#xA;        newPointId = newPoints.InsertNextPoint(beginPoint[0], beginPoint[1], beginPoint[2] + value * scalingFactor)&#xA;        pdo.InsertNextCell(3, 2, [beginIndex, newPointId]) # VTK_LINE is 3&#xA;        valIdArray.SetValue(i*numVars + v, v)&#xA;"
         panel_visibility="advanced">
         <Hints>
          <Widget type="multi_line"/>
