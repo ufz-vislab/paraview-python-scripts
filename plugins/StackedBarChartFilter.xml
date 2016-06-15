@@ -1,0 +1,69 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <SourceProxy name="StackedBarChartFilter" class="vtkPythonProgrammableFilter" label="Stacked Bar Chart Filter">
+
+      <Documentation
+        long_help="Creates a stacked bar chart (as lines) of all point data data arrays"
+        short_help="Creates a stacked bar chart (as lines) of all point data data arrays">
+      </Documentation>
+
+
+      <InputProperty
+        name="Input"
+                    clean_command="RemoveAllInputs"
+            command="AddInputConnection"
+            multiple_input="1">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkPolyData"/>
+          </DataTypeDomain>
+      </InputProperty>
+
+
+      <DoubleVectorProperty
+        name="scalingFactor"
+        label="scalingFactor"
+        initial_string="scalingFactor"
+        command="SetParameter"
+        animateable="1"
+        default_values="1.0"
+        number_of_elements="1">
+        <Documentation></Documentation>
+      </DoubleVectorProperty>
+
+
+
+
+      <!-- Output data type: "vtkPolyData" -->
+      <IntVectorProperty command="SetOutputDataSetType"
+                         default_values="0"
+                         name="OutputDataSetType"
+                         number_of_elements="1"
+                         panel_visibility="never">
+        <Documentation>The value of this property determines the dataset type
+        for the output of the programmable filter.</Documentation>
+      </IntVectorProperty>
+
+
+      <StringVectorProperty
+        name="Script"
+        command="SetScript"
+        number_of_elements="1"
+        default_values="&#xA;pdi = self.GetPolyDataInput()&#xA;pdo = self.GetPolyDataOutput()&#xA;&#xA;numPoints = pdi.GetNumberOfPoints()&#xA;numVars = pdi.GetPointData().GetNumberOfArrays()&#xA;numCells = numPoints * numVars&#xA;&#xA;pdo.Allocate(numCells)&#xA;&#xA;newPoints = vtk.vtkPoints()&#xA;pdo.SetPoints(newPoints)&#xA;&#xA;valIdArray = vtk.vtkIntArray()&#xA;valIdArray.SetName(&quot;ArrayIds&quot;)&#xA;valIdArray.SetNumberOfComponents(1)&#xA;valIdArray.SetNumberOfTuples(numCells)&#xA;pdo.GetCellData().AddArray(valIdArray)&#xA;&#xA;for i in range(0, numPoints-1):&#xA;    currentPoint = pdi.GetPoints().GetPoint(i)&#xA;    basePointId = newPoints.InsertNextPoint(currentPoint)&#xA;    for v in range(0, numVars):&#xA;        value = pdi.GetPointData().GetArray(v).GetTuple1(i)&#xA;        newPointId = newPoints.InsertNextPoint(currentPoint[0], currentPoint[1], currentPoint[2] + value * scalingFactor)&#xA;        linepoints = [basePointId + v, newPointId]&#xA;        pdo.InsertNextCell(3, 2, linepoints) # VTK_LINE is 3&#xA;        valIdArray.SetValue(i*numVars + v, v)&#xA;"
+        panel_visibility="advanced">
+        <Hints>
+         <Widget type="multi_line"/>
+       </Hints>
+      <Documentation>This property contains the text of a python program that
+      the programmable source runs.</Documentation>
+      </StringVectorProperty>
+
+
+
+    </SourceProxy>
+ </ProxyGroup>
+</ServerManagerConfiguration>
